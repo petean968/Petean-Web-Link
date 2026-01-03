@@ -1,135 +1,81 @@
+//Acest cod transformă aplicația asta într-un fel de "iconita de acces" (splash screen cu
+//cronometru) care, după 5 secunde, te trimite automat către browserul telefonului pentru
+//a vedea site-ul, gazduit pe Google Sites.Creat pe Google Drive
+//Google Drive nu mai permite oficial găzduirea de pagini web HTML direct
+//(serviciul a fost închis acum câțiva ani).
+//Totuși, link-ul este de Google Sites, funcțional, pe telefonul meu!
+//Ca-n gluma aia :_Functioneaza pe laptopul meu !_Nu putem sa dam laptopul tau clientului !
+
 package sandpa.vafex.peteanwebsitelink
-/*
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.webkit.WebView
-import android.webkit.WebViewClient
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val webView = findViewById<WebView>(R.id.webView)
-        webView.webViewClient = WebViewClient()
-        webView.loadUrl("https://sites.google.com/view/peteanautodidactic52/home")
-        webView.settings.javaScriptEnabled = true
-        webView.settings.setSupportZoom(true)
-    }
-}*/
-/*
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-
+    //Referință pentru un mini-browser intern (deși în final nu îl folosesc pentru afișare).
     private lateinit var webView: WebView
+    //Se scurg secundele
+    private lateinit var timerTextView: TextView
+    //Obiectul ce face numaratoarea inversa
     private var countdownTimer: CountDownTimer? = null
+    //Tmpul total de asteptare: 5 sec
+    private val totalTimeInMillis: Long = 5000
+    //Secunda se scade la fiecare 1000 ms
+    private val intervalInMillis: Long = 1000
 
+    //se incarca design-ul (Layout-ul)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        //configureaza WebView (mini browserul intern)
         webView = findViewById(R.id.webView)
+        //spune app, sa deschida link-urile in interior, nu in browser (teoretic)
         webView.webViewClient = WebViewClient()
+        //activeaza JavaScript (necesar pentru Google Sites)
         webView.settings.javaScriptEnabled = true
+        //permite marirea textului cu degetele
         webView.settings.setSupportZoom(true)
 
+        //identifica textul pentru cronometru
+        timerTextView = findViewById(R.id.timerTextView)
+
+        //porneste numaratoarea inversa
         startTimer()
     }
-
-    private fun startTimer() {
-        // Set the time in milliseconds (e.g., 10 seconds)
-        val totalTimeInMillis: Long = 10000
-
-        // Set the interval for countdown (e.g., 1 second)
-        val intervalInMillis: Long = 1000
-
-        countdownTimer = object : CountDownTimer(totalTimeInMillis, intervalInMillis) {
-            override fun onTick(millisUntilFinished: Long) {
-                // You can update UI here if you want to show the countdown (optional)
-            }
-
-            override fun onFinish() {
-                // Open the website after the countdown finishes
-                openWebsite()
-            }
-        }
-
-        countdownTimer?.start()
-    }
-
-    private fun openWebsite() {
-        // Replace "https://sites.google.com/view/peteanautodidactic52/home" with your actual website URL
-        val websiteUri = Uri.parse("https://sites.google.com/view/peteanautodidactic52/home")
-        val intent = Intent(Intent.ACTION_VIEW, websiteUri)
-        startActivity(intent)
-        finish() // Finish the activity after opening the website
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        // Cancel the countdown timer to avoid memory leaks
-        countdownTimer?.cancel()
-    }
-}
-*/
-
-import android.content.Intent
-import android.net.Uri
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var webView: WebView
-    private lateinit var timerTextView: TextView
-    private var countdownTimer: CountDownTimer? = null
-    private val totalTimeInMillis: Long = 5000 // Total time in milliseconds (e.g., 10 seconds)
-    private val intervalInMillis: Long = 1000 // Interval for countdown (e.g., 1 second)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        webView = findViewById(R.id.webView)
-        webView.webViewClient = WebViewClient()
-        webView.settings.javaScriptEnabled = true
-        webView.settings.setSupportZoom(true)
-
-        timerTextView = findViewById(R.id.timerTextView)
-
-        startTimer()
-    }
-
+    //logica cronometrului (startTimer) om
     private fun startTimer() {
         countdownTimer = object : CountDownTimer(totalTimeInMillis, intervalInMillis) {
+            //se executa la fiecare secunda
             override fun onTick(millisUntilFinished: Long) {
                 val secondsRemaining = millisUntilFinished / 1000
                 timerTextView.text = "Timer: $secondsRemaining seconds"
             }
-
+            //se execută când s-au terminat cele 5 secunde
             override fun onFinish() {
+            //lansarea website-ului
                 openWebsite()
             }
         }
-
+        //pornirea cronometrului
         countdownTimer?.start()
     }
 
     private fun openWebsite() {
-        // Replace "https://sites.google.com/view/peteanautodidactic52/home" with your actual website URL
+        //Uri(Uniform Resource Identifier:site,nr.tel,locatieGPS).Parse()(String->UriObject)
         val websiteUri = Uri.parse("https://sites.google.com/view/peteanautodidactic52/home")
+        //Intent:formular/cerere;intent:cerere completata.caSaVizualizez(ACTION_VIEW),
+        //websiteUri(aceasta adresa specifica)
         val intent = Intent(Intent.ACTION_VIEW, websiteUri)
+        //cine stie VIEW pentru un link?Chrome :_Eu;Opera:_Eu!
+        //Execution: Dacă e un singur browser, se deschide automat. Dacă sunt mai multe,
+        //apare acea fereastră mică jos: „Open with Chrome or Opera?”.
         startActivity(intent)
         finish() // Finish the activity after opening the website
     }
@@ -140,171 +86,3 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-/*
-
-import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var webView: WebView
-    private lateinit var timerTextView: TextView
-    private lateinit var textView: TextView
-    private var countdownTimer: CountDownTimer? = null
-    private val totalTimeInMillis: Long = 5000 // Total time in milliseconds (e.g., 10 seconds)
-    private val intervalInMillis: Long = 1000 // Interval for countdown (e.g., 1 second)
-    private val delayInMillis: Long = 1000 // Delay before starting countdown timer (e.g., 1 second)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        webView = findViewById(R.id.webView)
-        webView.webViewClient = WebViewClient()
-        webView.settings.javaScriptEnabled = true
-        webView.settings.setSupportZoom(true)
-
-        timerTextView = findViewById(R.id.timerTextView)
-        textView = findViewById(R.id.textView)
-
-        startTimerWithDelay()
-    }
-
-    private fun startTimerWithDelay() {
-        // Delay before starting countdown timer
-        object : CountDownTimer(delayInMillis, delayInMillis) {
-            override fun onTick(millisUntilFinished: Long) {
-                // Do nothing
-            }
-
-            override fun onFinish() {
-                startTimer()
-            }
-        }.start()
-    }
-
-    private fun startTimer() {
-        countdownTimer = object : CountDownTimer(totalTimeInMillis, intervalInMillis) {
-            override fun onTick(millisUntilFinished: Long) {
-                val secondsRemaining = millisUntilFinished / 1000
-                timerTextView.text = "Timer: $secondsRemaining seconds"
-            }
-
-            override fun onFinish() {
-                openWebsite()
-            }
-        }
-
-        countdownTimer?.start()
-    }
-
-    private fun openWebsite() {
-        // Replace "https://sites.google.com/view/peteanautodidactic52/home" with your actual website URL
-        val websiteUri = Uri.parse("https://sites.google.com/view/peteanautodidactic52/home")
-        val intent = Intent(Intent.ACTION_VIEW, websiteUri)
-        startActivity(intent)
-        finish() // Finish the activity after opening the website
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        countdownTimer?.cancel()
-    }
-}
-
-import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-
-class MainActivity : AppCompatActivity() {
-
-    private lateinit var webView: WebView
-    private lateinit var timerTextView: TextView
-    private lateinit var textView: TextView
-    private var countdownTimer: CountDownTimer? = null
-    private val totalTimeInMillis: Long = 5000 // Total time in milliseconds (e.g., 10 seconds)
-    private val intervalInMillis: Long = 1000 // Interval for countdown (e.g., 1 second)
-    private val delayInMillis: Long = 1000 // Delay before starting countdown timer (e.g., 1 second)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        webView = findViewById(R.id.webView)
-        webView.webViewClient = WebViewClient()
-        webView.settings.javaScriptEnabled = true
-        webView.settings.setSupportZoom(true)
-
-        timerTextView = findViewById(R.id.timerTextView)
-        textView = findViewById(R.id.textView)
-
-        startTimerWithDelay()
-    }
-
-    private fun startTimerWithDelay() {
-        // Delay before starting countdown timer
-        object : CountDownTimer(delayInMillis, delayInMillis) {
-            override fun onTick(millisUntilFinished: Long) {
-                // Do nothing
-            }
-
-            override fun onFinish() {
-                startTimer()
-            }
-        }.start()
-    }
-
-    private fun startTimer() {
-        countdownTimer = object : CountDownTimer(totalTimeInMillis, intervalInMillis) {
-            override fun onTick(millisUntilFinished: Long) {
-                val secondsRemaining = millisUntilFinished / 1000
-                timerTextView.text = "Timer: $secondsRemaining seconds"
-            }
-
-            override fun onFinish() {
-                openWebsite()
-            }
-        }
-
-        countdownTimer?.start()
-    }
-
-    private fun openWebsite() {
-        // Replace "https://sites.google.com/view/peteanautodidactic52/home" with your actual website URL
-        val websiteUri = Uri.parse("https://sites.google.com/view/peteanautodidactic52/home")
-        val intent = Intent(Intent.ACTION_VIEW, websiteUri)
-        startActivity(intent)
-        finish() // Finish the activity after opening the website
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        countdownTimer?.cancel()
-    }
-
-    private fun changeBackgroundColor(color: Int) {
-        textView.setBackgroundColor(color)
-    }
-
-    // Call this method with the desired color after the delay
-    private fun executeColorChange() {
-        // Change background color to red (you can replace with Color.YELLOW or Color.BLUE)
-        changeBackgroundColor(Color.RED)
-    }
-}
-*/
